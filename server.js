@@ -1,3 +1,14 @@
+/*********************************************************************************
+*  WEB700 – Assignment 05
+*  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part 
+*  of this assignment has been copied manually or electronically from any other source 
+*  (including 3rd party web sites) or distributed to other students.
+* 
+*  Name: April Ritz Alastre Student ID: 151509221 Date: 07/20/2023
+*
+*  Online (Vercel) Link: https://vercel.com/prils-projects/assignment5
+*
+********************************************************************************/ 
 const express = require("express");
 const path = require("path");
 const exphbs = require("express-handlebars");
