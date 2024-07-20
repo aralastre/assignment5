@@ -7,6 +7,7 @@ const app = express();
 
 const HTTP_PORT = process.env.PORT || 8080;
 
+// Set up handlebars engine
 app.engine('.hbs', exphbs.engine({ 
     defaultLayout: 'main',
     extname: '.hbs',
@@ -30,60 +31,61 @@ app.engine('.hbs', exphbs.engine({
 
 app.set('view engine', '.hbs');
 
+// Serve static files
 app.use(express.static("public"));
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
-app.use(function(req,res,next){
+// Middleware to set active route
+app.use(function(req, res, next){
     let route = req.path.substring(1);
     app.locals.activeRoute = "/" + (isNaN(route.split('/')[1]) ? route.replace(/\/(?!.*)/, "") : route.replace(/\/(.*)/, ""));    
     next();
 });
 
-
-app.get("/", (req,res) => {
+// Define routes
+app.get("/", (req, res) => {
     res.render("home");
 });
 
-app.get("/about", (req,res) => {
+app.get("/about", (req, res) => {
     res.render("about");
 });
 
-app.get("/htmlDemo", (req,res) => {
+app.get("/htmlDemo", (req, res) => {
     res.render("htmlDemo");
 });
 
 app.get("/students", (req, res) => {
     if (req.query.course) {
-        data.getStudentsByCourse(req.query.course).then((data) => {
-            res.render("students", {students: data});
+        data.getStudentsByCourse(req.query.course).then((students) => {
+            res.render("students", { students });
         }).catch((err) => {
-            res.render("students", {message: "no results"});
+            res.render("students", { message: "no results" });
         });
     } else {
-        data.getAllStudents().then((data) => {
-            res.render("students", {students: data});
+        data.getAllStudents().then((students) => {
+            res.render("students", { students });
         }).catch((err) => {
-            res.render("students", {message: "no results"});
+            res.render("students", { message: "no results" });
         });
     }
 });
 
-app.get("/students/add", (req,res) => {
+app.get("/students/add", (req, res) => {
     res.render("addStudent");
 });
 
-
 app.post("/students/add", (req, res) => {
-    data.addStudent(req.body).then(()=>{
-      res.redirect("/students");
+    data.addStudent(req.body).then(() => {
+        res.redirect("/students");
     });
-  });
+});
 
 app.get("/student/:studentNum", (req, res) => {
-    data.getStudentByNum(req.params.studentNum).then((data) => {
-        res.render("student", { student: data }); 
+    data.getStudentByNum(req.params.studentNum).then((student) => {
+        res.render("student", { student }); 
     }).catch((err) => {
-        res.render("student", {message: "no results"})
+        res.render("student", { message: "no results" });
     });
 });
 
@@ -93,32 +95,32 @@ app.post("/student/update", (req, res) => {
     });
 });
 
-app.get("/courses", (req,res) => {
-    data.getCourses().then((data)=>{
-        res.render("courses", {courses: data});
-    }).catch(err=>{
-        res.render("courses", {message: "no results"});
+app.get("/courses", (req, res) => {
+    data.getCourses().then((courses) => {
+        res.render("courses", { courses });
+    }).catch((err) => {
+        res.render("courses", { message: "no results" });
     });
 });
 
 app.get("/course/:id", (req, res) => {
-    data.getCourseById(req.params.id).then((data) => {
-        res.render("course", { course: data }); 
+    data.getCourseById(req.params.id).then((course) => {
+        res.render("course", { course }); 
     }).catch((err) => {
-        res.render("course",{message:"no results"}); 
+        res.render("course", { message: "no results" });
     });
 });
 
-app.use((req,res)=>{
+// Handle 404 errors
+app.use((req, res) => {
     res.status(404).send("Page Not Found");
 });
 
-
-data.initialize().then(function(){
-    app.listen(HTTP_PORT, function(){
-        console.log("app listening on: " + HTTP_PORT)
+// Initialize data and start server
+data.initialize().then(() => {
+    app.listen(HTTP_PORT, () => {
+        console.log(`Server listening on port ${HTTP_PORT}`);
     });
-}).catch(function(err){
-    console.log("unable to start server: " + err);
+}).catch((err) => {
+    console.log("Unable to start server: " + err);
 });
-
